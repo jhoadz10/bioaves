@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BioAves — Biodiversidad y Aves de Colombia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Nunito',sans-serif;background:#0a1f10;color:#f0f7e6;min-height:100vh;overflow-x:hidden;}
+    .fbg{position:fixed;inset:0;background:radial-gradient(ellipse at 15% 85%,#1a4a2e 0%,transparent 45%),radial-gradient(ellipse at 85% 15%,#0a3020 0%,transparent 45%),#0a1f10;z-index:0;}
+    .content{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:0 18px 60px;}
+
+    /* HEADER */
+    .hdr{text-align:center;padding:36px 0 22px;}
+    .floatrow{display:flex;justify-content:center;gap:16px;margin-bottom:16px;}
+    .fbird{font-size:32px;animation:flt 3s ease-in-out infinite;}
+    .fbird:nth-child(2){animation-delay:.4s;}
+    .fbird:nth-child(3){animation-delay:.8s;}
+    .fbird:nth-child(4){animation-delay:1.2s;}
+    @keyframes flt{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+    .title{font-family:'Playfair Display',serif;font-size:clamp(42px,8vw,78px);font-weight:900;color:#f0f7e6;line-height:1;margin-bottom:6px;}
+    .title span{color:#7ed855;}
+    .sub{font-size:11.5px;color:#7aab7a;letter-spacing:3px;text-transform:uppercase;font-weight:700;margin-bottom:10px;}
+    .status-bar{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:28px;}
+    .status-dot{width:9px;height:9px;border-radius:50%;background:#ff4444;transition:background .3s;}
+    .status-dot.connected{background:#7ed855;animation:pulse 2s infinite;}
+    @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+    .status-txt{font-size:11.5px;color:#6a9a6a;font-weight:600;}
+
+    /* WELCOME */
+    .wcard{background:rgba(255,255,255,.05);border:.5px solid rgba(126,216,85,.2);border-radius:18px;padding:24px 28px;margin-bottom:30px;backdrop-filter:blur(6px);}
+    .wcard p{font-size:14px;line-height:1.85;color:#b8dbb8;text-align:center;}
+    .wicon{font-size:30px;display:block;text-align:center;margin-bottom:12px;}
+
+    /* BADGES */
+    .badges{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:32px;}
+    .badge{background:rgba(126,216,85,.1);border:.5px solid rgba(126,216,85,.24);border-radius:100px;padding:5px 15px;font-size:11px;color:#8ec88e;font-weight:700;letter-spacing:.8px;}
+
+    /* SECTION */
+    .stitle{font-family:'Playfair Display',serif;font-size:clamp(19px,3.5vw,27px);font-weight:700;color:#f0f7e6;text-align:center;margin-bottom:6px;}
+    .ssub{text-align:center;color:#7aab7a;font-size:13px;margin-bottom:22px;}
+
+    /* ADMIN BAR */
+    .abar{display:flex;justify-content:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
+    .btnr{background:rgba(255,80,80,.08);border:1px solid rgba(255,80,80,.25);color:#ff8888;border-radius:100px;padding:7px 18px;font-size:12px;font-family:'Nunito',sans-serif;cursor:pointer;font-weight:700;transition:all .2s;display:inline-flex;align-items:center;gap:6px;}
+    .btnr:hover{background:rgba(255,80,80,.18);border-color:rgba(255,80,80,.5);}
+
+    /* BIRD GRID */
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(125px,1fr));gap:13px;margin-bottom:32px;}
+    .bcard{background:rgba(255,255,255,.04);border:1.5px solid rgba(126,216,85,.15);border-radius:14px;padding:11px 7px;text-align:center;cursor:pointer;transition:all .23s;position:relative;overflow:hidden;}
+    .bcard:hover:not(.taken):not(.sel){background:rgba(126,216,85,.1);border-color:rgba(126,216,85,.5);transform:translateY(-4px);box-shadow:0 10px 28px rgba(126,216,85,.18);}
+    .bcard.sel{background:rgba(126,216,85,.18);border-color:#7ed855;transform:translateY(-4px);box-shadow:0 10px 28px rgba(126,216,85,.28);}
+    .bcard.taken{opacity:.3;cursor:not-allowed;filter:grayscale(.8);}
+    .imgw{width:78px;height:78px;margin:0 auto 9px;border-radius:50%;overflow:hidden;border:2px solid rgba(126,216,85,.24);background:#0a2a14;display:flex;align-items:center;justify-content:center;}
+    .imgw img{width:100%;height:100%;object-fit:cover;display:block;}
+    .bname{font-size:10px;font-weight:700;color:#f0f7e6;line-height:1.3;margin-bottom:2px;}
+    .bsci{font-size:8.5px;color:#5a8a5a;font-style:italic;}
+    .tov{position:absolute;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;font-size:20px;border-radius:12px;}
+    .chk{position:absolute;top:6px;right:6px;background:#7ed855;color:#0a1f10;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;}
+
+    /* DOTS */
+    .dots{display:flex;justify-content:center;gap:8px;margin-bottom:28px;}
+    .dot{width:8px;height:8px;border-radius:50%;background:rgba(126,216,85,.22);transition:all .3s;}
+    .dot.on{background:#7ed855;transform:scale(1.4);}
+
+    /* CTA */
+    .cta{text-align:center;padding:8px 0 36px;}
+    .btngo{display:inline-flex;align-items:center;gap:11px;background:linear-gradient(135deg,#7ed855,#4caf50);color:#0a1f10;font-family:'Nunito',sans-serif;font-size:17px;font-weight:700;padding:17px 46px;border-radius:100px;border:none;cursor:pointer;text-decoration:none;transition:all .3s;box-shadow:0 8px 28px rgba(126,216,85,.36);letter-spacing:.3px;}
+    .btngo:hover:not(.dis){transform:translateY(-3px);box-shadow:0 15px 36px rgba(126,216,85,.45);}
+    .btngo.dis{background:rgba(255,255,255,.07);color:#3a5a3a;cursor:not-allowed;box-shadow:none;pointer-events:none;}
+    .hint{color:#5a8a5a;font-size:12px;margin-top:10px;}
+
+    /* FLOATING COMPANION */
+    .comp{position:fixed;bottom:16px;right:16px;background:rgba(10,31,16,.97);border:1.5px solid #7ed855;border-radius:18px;padding:11px 15px;display:none;align-items:center;gap:11px;z-index:100;box-shadow:0 8px 28px rgba(126,216,85,.28);animation:bIn .45s ease;}
+    .comp.vis{display:flex;}
+    @keyframes bIn{0%{transform:scale(.5) translateY(18px);opacity:0;}70%{transform:scale(1.04) translateY(-3px);}100%{transform:scale(1) translateY(0);opacity:1;}}
+    .cimg{width:44px;height:44px;border-radius:50%;overflow:hidden;border:2px solid #7ed855;animation:flt 2.5s ease-in-out infinite;flex-shrink:0;}
+    .cimg img{width:100%;height:100%;object-fit:cover;}
+    .ctxt{font-size:11px;color:#8ec88e;line-height:1.5;}
+    .cname{font-weight:700;color:#7ed855;font-size:12px;display:block;}
+
+    /* LOADER */
+    .loader{position:fixed;inset:0;background:#0a1f10;z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;transition:opacity .5s;}
+    .loader.hidden{opacity:0;pointer-events:none;}
+    .spinner{width:44px;height:44px;border:3px solid rgba(126,216,85,.2);border-top-color:#7ed855;border-radius:50%;animation:spin 1s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+    .loader-txt{color:#7aab7a;font-size:14px;font-family:'Nunito',sans-serif;}
+    .loader-logo{font-family:'Playfair Display',serif;font-size:36px;font-weight:900;color:#f0f7e6;}
+    .loader-logo span{color:#7ed855;}
+
+    /* TOAST */
+    .toast{position:fixed;top:18px;left:50%;transform:translateX(-50%);background:#1a4a2e;border:1px solid #7ed855;color:#b8dbb8;padding:10px 22px;border-radius:100px;font-size:12.5px;font-weight:600;z-index:300;opacity:0;transition:opacity .3s;pointer-events:none;font-family:'Nunito',sans-serif;white-space:nowrap;}
+    .toast.show{opacity:1;}
+
+    /* RESPONSIVE */
+    @media(max-width:500px){
+      .grid{grid-template-columns:repeat(3,1fr);gap:9px;}
+      .imgw{width:64px;height:64px;}
+      .bname{font-size:9px;}
+      .bsci{display:none;}
+      .btngo{font-size:15px;padding:14px 32px;}
+    }
+    @media(max-width:360px){
+      .grid{grid-template-columns:repeat(2,1fr);}
+    }
+  </style>
+</head>
+<body>
+
+<div class="fbg"></div>
+<div class="toast" id="toast"></div>
+
+<!-- LOADER -->
+<div class="loader" id="loader">
+  <p class="loader-logo">Bio<span>Aves</span></p>
+  <div class="spinner"></div>
+  <p class="loader-txt">Conectando con Firebase...</p>
+</div>
+
+<!-- MAIN -->
+<div class="content">
+  <div class="hdr">
+    <div class="floatrow">
+      <span class="fbird">🦜</span>
+      <span class="fbird">🦅</span>
+      <span class="fbird">🌿</span>
+      <span class="fbird">🦋</span>
+    </div>
+    <h1 class="title">Bio<span>Aves</span></h1>
+    <p class="sub">Colombia · Biodiversidad · Conservación</p>
+    <div class="status-bar">
+      <div class="status-dot" id="sdot"></div>
+      <span class="status-txt" id="stxt">Conectando...</span>
+    </div>
+  </div>
+
+  <div class="wcard">
+    <span class="wicon">🌿</span>
+    <p>Este cuestionario ayuda a conocer mejor lo que piensas, sientes y haces en relación con las aves, la naturaleza y la biodiversidad de tu territorio. No hay respuestas correctas ni incorrectas: lo que nos interesa es conocer tu opinión y experiencia real. Responde con honestidad. Tus respuestas son confidenciales y se usarán únicamente con fines educativos.</p>
+  </div>
+
+  <div class="badges">
+    <span class="badge">🏔 Bosque Andino</span>
+    <span class="badge">🌴 Selva Húmeda</span>
+    <span class="badge">☁️ Páramo</span>
+    <span class="badge">🌊 Manglar</span>
+    <span class="badge">🇨🇴 Nariño</span>
+  </div>
+
+  <h2 class="stitle">Elige tu ave acompañante</h2>
+  <p class="ssub">Selecciona un ave — se sincroniza en tiempo real entre todos los dispositivos.</p>
+
+  <div class="abar">
+    <button class="btnr" onclick="resetBirds()">
+      <i class="ti ti-refresh"></i> Restablecer aves (Admin)
+    </button>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="dots">
+    <div class="dot on" id="d1"></div>
+    <div class="dot" id="d2"></div>
+    <div class="dot" id="d3"></div>
+  </div>
+
+  <div class="cta">
+    <a id="btngo" href="https://forms.gle/hz9ZJa8VQWsv1GuX9" target="_blank" class="btngo dis" onclick="goForm(event)">
+      <span>🦜</span>
+      <span>Comenzar cuestionario</span>
+      <i class="ti ti-arrow-right"></i>
+    </a>
+    <p class="hint" id="hint">Primero selecciona tu ave acompañante</p>
+  </div>
+</div>
+
+<!-- COMPANION -->
+<div class="comp" id="comp">
+  <div class="cimg"><img id="cimg" src="" alt="ave acompañante"></div>
+  <div class="ctxt">
+    <span class="cname" id="cname">Tu ave</span>
+    ¡Te acompaña en el viaje! 🌿
+  </div>
+</div>
+
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp }               from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getDatabase, ref, set, onValue, remove } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
+/* ── CONFIGURACIÓN FIREBASE ── */
+const firebaseConfig = {
+  apiKey:            "AIzaSyC235vGnFHTxmXukS4byNBsYdLJ9pkOnFA",
+  authDomain:        "bioaves-60291.firebaseapp.com",
+  databaseURL:       "https://bioaves-60291-default-rtdb.firebaseio.com",
+  projectId:         "bioaves-60291",
+  storageBucket:     "bioaves-60291.firebasestorage.app",
+  messagingSenderId: "302462439721",
+  appId:             "1:302462439721:web:614e3ce704956d668e6738"
+};
+
+/* ── CONSTANTES ── */
+const FORM_URL  = 'https://forms.gle/hz9ZJa8VQWsv1GuX9';
+const ADMIN_PIN = '2025';   // <-- Cambia este PIN si quieres
+
+/* ── AVES ── */
+const birds = [
+  {id:1,  name:'Cóndor de los Andes',    sci:'Vultur gryphus',            img:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Condor_CA.jpg/320px-Condor_CA.jpg'},
+  {id:2,  name:'Guacamaya Bandera',       sci:'Ara macao',                 img:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Scarlet-Macaw.jpg/320px-Scarlet-Macaw.jpg'},
+  {id:3,  name:'Tucán Pico Iris',         sci:'Ramphastos sulfuratus',     img:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Keel-billed-Toucan.jpg/320px-Keel-billed-Toucan.jpg'},
+  {id:4,  name:'Gallo de Roca',           sci:'Rupicola peruvianus',       img:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Rupicola_peruvianus_-male.jpg/320px-Rupicola_peruvianus_-male.jpg'},
+  {id:5,  name:'Quetzal Crestado',        sci:'Pharomachrus antisianus',   img:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Crested_Quetzal_2.jpg/320px-Crested_Quetzal_2.jpg'},
+  {id:6,  name:'Colibrí Pico de Espada', sci:'Ensifera ensifera',         img:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Ensifera_ensifera_%28Sword-billed_Hummingbird%29.jpg/320px-Ensifera_ensifera_%28Sword-billed_Hummingbird%29.jpg'},
+  {id:7,  name:'Tangara Multicolor',      sci:'Chlorochrysa nitidissima',  img:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Chlorochrysa_nitidissima.jpg/320px-Chlorochrysa_nitidissima.jpg'},
+  {id:8,  name:'Loro Orejiamarillo',      sci:'Ognorhynchus icterotis',    img:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Yellow-eared_Parrot_RWD2.jpg/320px-Yellow-eared_Parrot_RWD2.jpg'},
+  {id:9,  name:'Pava Caucana',            sci:'Penelope perspicax',        img:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Cauca_Guan_RWD.jpg/320px-Cauca_Guan_RWD.jpg'},
+  {id:10, name:'Tucán de Montaña',        sci:'Andigena nigrirostris',     img:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Andigena_nigrirostris_-Colombia-8.jpg/320px-Andigena_nigrirostris_-Colombia-8.jpg'},
+  {id:11, name:'Garza Real',              sci:'Ardea herodias',            img:'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Great_blue_heron_from_back.jpg/320px-Great_blue_heron_from_back.jpg'},
+  {id:12, name:'Martín Pescador',         sci:'Ceryle torquata',           img:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Ringed_Kingfisher%2C_Megaceryle_torquata%2C_male.jpg/320px-Ringed_Kingfisher%2C_Megaceryle_torquata%2C_male.jpg'},
+  {id:13, name:'Búho de Anteojos',        sci:'Pulsatrix perspicillata',   img:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Spectacled_Owl_RWD2.jpg/320px-Spectacled_Owl_RWD2.jpg'},
+  {id:14, name:'Tangara Dorada',          sci:'Tangara arthus',            img:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Tangara_arthus_-_Golden_Tanager.jpg/320px-Tangara_arthus_-_Golden_Tanager.jpg'},
+  {id:15, name:'Colibrí del Sol',         sci:'Heliangelus exortis',       img:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Tourmaline_Sunangel.jpg/320px-Tourmaline_Sunangel.jpg'},
+  {id:16, name:'Fragata Magnífica',       sci:'Fregata magnificens',       img:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Magnificent_Frigatebird.jpg/320px-Magnificent_Frigatebird.jpg'},
+  {id:17, name:'Colibrí Cola Violeta',    sci:'Aglaiocercus kingii',       img:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Violet-tailed_Sylph_male.jpg/320px-Violet-tailed_Sylph_male.jpg'},
+  {id:18, name:'Carpintero Real',         sci:'Campephilus gayaquilensis',  img:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Campephilus_gayaquilensis_-Ecuador-8.jpg/320px-Campephilus_gayaquilensis_-Ecuador-8.jpg'},
+  {id:19, name:'Pato Zambullidor',        sci:'Podilymbus podiceps',       img:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Pied-billed_Grebe_%28Podilymbus_podiceps%29.jpg/320px-Pied-billed_Grebe_%28Podilymbus_podiceps%29.jpg'},
+  {id:20, name:'Tángara Llameante',       sci:'Piranga flava',             img:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Piranga_flava_-Peru-8.jpg/320px-Piranga_flava_-Peru-8.jpg'},
+];
+
+/* ── ESTADO ── */
+const sessionId = 'u_' + Date.now() + '_' + Math.random().toString(36).substr(2,6);
+let takenMap  = {};
+let myBirdId  = null;
+
+/* ── FIREBASE INIT ── */
+const fbApp   = initializeApp(firebaseConfig);
+const db      = getDatabase(fbApp);
+const birdsRef = ref(db, 'bioaves/birds');
+
+/* ── HELPERS UI ── */
+function showToast(msg, dur=2800){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), dur);
+}
+
+function setConnected(ok){
+  const dot = document.getElementById('sdot');
+  const txt = document.getElementById('stxt');
+  if(ok){ dot.classList.add('connected'); txt.textContent = 'Conectado en tiempo real ✓'; }
+  else   { dot.classList.remove('connected'); txt.textContent = 'Sin conexión — modo local'; }
+}
+
+function hideLoader(){
+  document.getElementById('loader').classList.add('hidden');
+}
+
+/* ── RENDER ── */
+function render(){
+  const g = document.getElementById('grid');
+  g.innerHTML = '';
+  birds.forEach(b => {
+    const takenBy = takenMap[b.id];
+    const isMine  = takenBy === sessionId;
+    const isTaken = takenBy && !isMine;
+    const d = document.createElement('div');
+    d.className = 'bcard' + (isTaken?' taken':'') + (isMine?' sel':'');
+    if(!isTaken) d.onclick = () => pick(b.id, isMine);
+    d.innerHTML = `
+      <div class="imgw">
+        <img src="${b.img}" alt="${b.name}"
+          onerror="this.parentNode.innerHTML='<div style=\\'font-size:36px;line-height:78px;\\'>🐦</div>'">
+      </div>
+      <div class="bname">${b.name}</div>
+      <div class="bsci">${b.sci}</div>
+      ${isTaken ? '<div class="tov">🔒</div>' : ''}
+      ${isMine  ? '<div class="chk">✓</div>'  : ''}
+    `;
+    g.appendChild(d);
+  });
+}
+
+/* ── ESCUCHAR FIREBASE EN TIEMPO REAL ── */
+onValue(birdsRef, snapshot => {
+  hideLoader();
+  setConnected(true);
+  takenMap = snapshot.val() || {};
+  render();
+}, err => {
+  console.error('Firebase error:', err);
+  setConnected(false);
+  hideLoader();
+  try{ takenMap = JSON.parse(localStorage.getItem('ba_local')||'{}'); }catch(e){ takenMap={}; }
+  render();
+});
+
+/* ── SELECCIONAR AVE ── */
+async function pick(birdId, alreadyMine){
+  if(alreadyMine) return;
+
+  // Verificar disponibilidad actual
+  const snap = await new Promise(res => onValue(birdsRef, s=>res(s), {onlyOnce:true}));
+  const cur  = snap.val() || {};
+  if(cur[birdId] && cur[birdId] !== sessionId){
+    showToast('⚠️ Ese ave ya fue tomada. Elige otra.');
+    return;
+  }
+
+  // Liberar ave anterior
+  if(myBirdId && myBirdId !== birdId){
+    await set(ref(db, `bioaves/birds/${myBirdId}`), null);
+  }
+
+  // Reservar en Firebase
+  myBirdId = birdId;
+  await set(ref(db, `bioaves/birds/${birdId}`), sessionId);
+
+  // Backup local
+  try{ localStorage.setItem('ba_local', JSON.stringify({...cur,[birdId]:sessionId})); }catch(e){}
+
+  const b = birds.find(x => x.id === birdId);
+  showComp(b);
+  document.getElementById('btngo').classList.remove('dis');
+  document.getElementById('hint').textContent = '¡Tu ave está lista! Haz clic para comenzar 🌿';
+  document.getElementById('d2').classList.add('on');
+  document.getElementById('d3').classList.add('on');
+  showToast('🦜 ' + b.name + ' es tu ave acompañante');
+}
+
+function showComp(b){
+  document.getElementById('cimg').src   = b.img;
+  document.getElementById('cname').textContent = b.name;
+  document.getElementById('comp').classList.add('vis');
+}
+
+/* ── RESTABLECER (ADMIN) ── */
+window.resetBirds = async function(){
+  const pin = prompt('Ingresa el PIN de administrador:');
+  if(pin !== ADMIN_PIN){ showToast('❌ PIN incorrecto'); return; }
+  await remove(birdsRef);
+  myBirdId = null;
+  try{ localStorage.removeItem('ba_local'); }catch(e){}
+  document.getElementById('comp').classList.remove('vis');
+  document.getElementById('btngo').classList.add('dis');
+  document.getElementById('hint').textContent = 'Primero selecciona tu ave acompañante';
+  document.getElementById('d2').classList.remove('on');
+  document.getElementById('d3').classList.remove('on');
+  showToast('✅ Todas las aves restablecidas');
+};
+
+/* ── IR AL FORMULARIO ── */
+window.goForm = function(e){
+  if(!myBirdId){ e.preventDefault(); showToast('Primero elige tu ave 🦜'); return; }
+  // El enlace se abre normalmente via href en el <a>
+};
+</script>
+</body>
+</html>
